@@ -1,16 +1,16 @@
 import React, { useState } from "react";
+import axios from "axios";
 import "./Add.css";
 import { assets } from "../../assets/assets";
-import axios from "axios"
+import { toast } from "react-toastify";
 
-function Add(props) {
-  const url = "http://localhost:4000";
+function Add({ url }) {
   const [image, setImage] = useState(false);
   const [data, setData] = useState({
     name: "",
     description: "",
     price: "",
-    category: "Salad",
+    category: "salad",
   });
 
   const onChangeHandler = (event) => {
@@ -19,29 +19,42 @@ function Add(props) {
     setData((data) => ({ ...data, [name]: value }));
   };
 
-  const  onSubmitHandler = async (event)=>{
-       event.preventDefault();
-       const formData = new FormData();
-       formData.append("name",data.name)
-       formData.append("description",data.description)
-       formData.append("price",Number(data.price))
-       formData.append("category",data.category)
-       formData.append("image",image)
-       const response = await axios.post(`${url}/api/food/add`,formData)
-       if (response.data.success) {
-          setData({
-            name: "",
-            description: "",
-            price: "",
-            category: "Salad",
-          })
-          setImage(false)
-       }else{
+  console.log("««««« data »»»»»", data);
 
-       }
-  }
+  const onSubmitHandler = async (event) => {
+    event.preventDefault(); // Ngăn chặn hành vi mặc định của form (không tải lại trang).
 
-  
+    const formData = new FormData(); // Tạo đối tượng FormData để lưu trữ dữ liệu form.
+
+    // Thêm các cặp khóa-giá trị vào FormData từ đối tượng data và image.
+    formData.append("name", data.name); // Thêm tên.
+    formData.append("description", data.description); // Thêm mô tả.
+    formData.append("price", Number(data.price)); // Thêm giá, chuyển sang kiểu số.
+    formData.append("category", data.category); // Thêm danh mục.
+    formData.append("image", image); // Thêm hình ảnh.
+    // Gửi yêu cầu POST đến API để thêm một mục thực phẩm mới.
+    const response = await axios.post(`${url}/api/food/add`, formData);
+
+    // Log phản hồi từ API.
+    console.log("««««« response »»»»»", response);
+
+    // Kiểm tra phản hồi từ API xem có thành công không.
+    if (response.data.success) {
+      // Nếu thành công, đặt lại dữ liệu form và trạng thái hình ảnh.
+      setData({
+        name: "",
+        description: "",
+        price: "",
+        category: "Salad", // Giá trị mặc định.
+      });
+      setImage(false); // Đặt lại trạng thái hình ảnh.
+      toast.success(response.data.message);
+    } else {
+      // Xử lý trường hợp lỗi ở đây (nếu cần thiết).
+      toast.error(response.data.message);
+    }
+  };
+
   return (
     <div className="add">
       <form className="flex-col" onSubmit={onSubmitHandler}>
@@ -85,14 +98,14 @@ function Add(props) {
           <div className="add-cetegory flex-col">
             <p>Product category</p>
             <select onChange={onChangeHandler} name="category">
-              <option value="">Salad</option>
-              <option value="">Rolls</option>
-              <option value="">Deserts</option>
-              <option value="">Sandwich</option>
-              <option value="">Cake</option>
-              <option value="">Pure Veg</option>
-              <option value="">Pasta</option>
-              <option value="">Noodles</option>
+              <option value="Salad">Salad</option>
+              <option value="Rolls">Rolls</option>
+              <option value="Deserts">Deserts</option>
+              <option value="Sandwich">Sandwich</option>
+              <option value="Cake">Cake</option>
+              <option value="Pure Veg">Pure Veg</option>
+              <option value="Pasta">Pasta</option>
+              <option value="Noodles">Noodles</option>
             </select>
           </div>
           <div className="add-price flex-col">
